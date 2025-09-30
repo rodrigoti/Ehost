@@ -6,7 +6,7 @@
 
     
     <application
-        android:label="ehost"
+        android:label="APP_NAME_PLACEHOLDER"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
