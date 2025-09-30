@@ -26,7 +26,7 @@ on:
       package_name:
         description: "Pacote do App (applicationId ex: com.ehost.app)"
         required: false
-        default: "com.ehost.app"
+        default: "com.appehost.ehost"
 
 jobs:
   build:
