@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.appehost.ehost"
+    namespace = "APPLICATION_ID_PLACEHOLDER"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

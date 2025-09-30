@@ -62,13 +62,13 @@ jobs:
       - name: Configurar variáveis no código
         run: |
           echo "Substituindo variáveis no código..."
-          # Nome do app no Manifest
+          # Nome do app
           sed -i "s|APP_NAME_PLACEHOLDER|${{ github.event.inputs.app_name }}|g" android/app/src/main/AndroidManifest.xml
-          # Variáveis no config.dart
+          # Config.dart
           sed -i "s|APP_NAME_PLACEHOLDER|${{ github.event.inputs.app_name }}|g" lib/config.dart || true
           sed -i "s|API_URL_PLACEHOLDER|${{ github.event.inputs.api_url }}|g" lib/config.dart || true
-          # ApplicationId no build.gradle
-          sed -i "s|applicationId \".*\"|applicationId \"${{ github.event.inputs.package_name }}\"|g" android/app/build.gradle
+          # ApplicationId no Gradle Kotlin DSL
+          sed -i "s|applicationId = \".*\"|applicationId = \"${{ github.event.inputs.package_name }}\"|g" android/app/build.gradle.kts
 
       # 6. Build APK (debug ou release, com versão e build number)
       - name: Build APK
