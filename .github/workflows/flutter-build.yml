@@ -81,7 +81,7 @@ jobs:
               --no-shrink
           else
             flutter build apk \
-              --debug \
+              --release \
               --target-platform android-arm64 \
               --build-name=${{ github.event.inputs.build_name }} \
               --build-number=${{ github.event.inputs.build_number }}
