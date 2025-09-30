@@ -64,7 +64,7 @@ jobs:
           if [ "${{ github.event.inputs.build_mode }}" = "release" ]; then
             flutter build apk --release
           else
-            flutter build apk --debug
+            flutter build apk --release --target-platform android-arm64
           fi
 
       # 7. Upload artefato (APK)
