@@ -10,11 +10,11 @@ on:
       app_name:
         description: "Nome do App"
         required: false
-        default: "MeuApp"
+        default: "Ehost"
       api_url:
         description: "URL da API"
         required: false
-        default: "https://api.exemplo.com"
+        default: "https://acesso.ehostsolucoes.com.br/super/apps/?id=985"
   #push:
    # paths:
     #  - "lib/**"
