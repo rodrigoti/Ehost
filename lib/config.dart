@@ -13,8 +13,8 @@ class AppSettings {
     defaultValue: 'https://acesso.ehostsolucoes.com.br/super/apps/?id=985',
   );
 
-  static const String color = String.fromEnvironment(
-    'APP_COLOR',
+  static const String appIconColor = String.fromEnvironment(
+    'APP_ICON_COLOR',
     defaultValue: '#2196F3',
   );
 }

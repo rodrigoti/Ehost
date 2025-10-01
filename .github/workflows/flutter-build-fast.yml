@@ -11,8 +11,8 @@ on:
         description: "URL da API"
         required: false
         default: "https://acesso.ehostsolucoes.com.br/super/apps/?id=985"
-      app_color:
-        description: "Cor primária do App"
+      app_icon_color:
+        description: "Cor Background do Ícone"
         required: false
         default: "#2196F3"
       package_name:
@@ -69,6 +69,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      # 6. Substituir cores no pubspec.yaml
+      - name: Update Colors in pubspec.yaml
+        run: |
+          sed -i "s|color: \".*\"|color: \"${{ github.event.inputs.app_icon_color }}\"|g" pubspec.yaml
+          sed -i "s|adaptive_icon_background: \".*\"|adaptive_icon_background: \"${{ github.event.inputs.app_icon_color }}\"|g" pubspec.yaml
+
       # 6. Gerar splash e ícones
       - name: Generate Splash & Icons
         run: |
@@ -93,7 +99,7 @@ jobs:
             --build-number=${{ github.event.inputs.build_number }} \
             --dart-define="APP_NAME=${{ github.event.inputs.app_name }}" \
             --dart-define="API_URL=${{ github.event.inputs.api_url }}" \
-            --dart-define="APP_COLOR=${{ github.event.inputs.app_color }}"
+            --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}"
 
       # 8. Upload artefato
       - name: Upload Fast APK
