@@ -14,7 +14,7 @@ on:
       app_icon_color:
         description: "Cor Background do Ícone"
         required: false
-        default: "#2196F3"
+        default: "#FFE05F"
       package_name:
         description: "Pacote do App (ex: com.appehost.ehost)"
         required: false

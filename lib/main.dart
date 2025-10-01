@@ -15,8 +15,8 @@ void main() => {
         const SystemUiOverlayStyle(
           systemNavigationBarColor: Color(0xff171815), // navigation bar color
           statusBarColor: Color(0xff171815),
-          systemNavigationBarIconBrightness: Brightness.light,
-          statusBarIconBrightness: Brightness.light,
+          systemNavigationBarIconBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.dark,
         ),
       ),
       WidgetsFlutterBinding.ensureInitialized(),
