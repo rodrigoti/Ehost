@@ -12,9 +12,9 @@ on:
         required: false
         default: "https://acesso.ehostsolucoes.com.br/super/apps/?id=985"
       package_name:
-        description: "Pacote do App (ex: com.ehost.test)"
+        description: "Pacote do App (ex: com.appehost.ehost)"
         required: false
-        default: "com.ehost.test"
+        default: "com.appehost.ehost"
       build_name:
         description: "Versão (ex: 0.0.1)"
         required: false
