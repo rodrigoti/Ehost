@@ -74,6 +74,7 @@ jobs:
         run: |
           sed -i "s|color: \".*\"|color: \"${{ github.event.inputs.app_icon_color }}\"|g" pubspec.yaml
           sed -i "s|adaptive_icon_background: \".*\"|adaptive_icon_background: \"${{ github.event.inputs.app_icon_color }}\"|g" pubspec.yaml
+          cat pubspec.yaml
 
       # 6. Gerar splash e ícones
       - name: Generate Splash & Icons
