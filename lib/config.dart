@@ -1,7 +1,7 @@
 /// Arquivo de configuração que será sobrescrito pelo GitHub Actions
 /// usando `sed` no workflow flutter-build.yml
 
-
+ 
 class AppSettings {
   static const String appName = String.fromEnvironment(
     'APP_NAME',
