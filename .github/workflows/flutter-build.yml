@@ -1,4 +1,4 @@
-name: Flutter Build (Fast)
+name: Flutter Build (Lazy)
 
 on:
   workflow_dispatch:
