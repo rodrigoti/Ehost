@@ -69,6 +69,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      # 6. Gerar splash e ícones
+      - name: Generate Splash & Icons
+        run: |
+          flutter pub run flutter_native_splash:create
+          flutter pub run flutter_launcher_icons:main
+
       # 6. Substituir variáveis
       - name: Configurar variáveis no código
         run: |
