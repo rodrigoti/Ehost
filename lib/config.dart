@@ -1,8 +1,20 @@
 /// Arquivo de configuração que será sobrescrito pelo GitHub Actions
 /// usando `sed` no workflow flutter-build.yml
 
+
 class AppSettings {
-  static const String appName = "APP_NAME_PLACEHOLDER";
-  static const String apiUrl  = "API_URL_PLACEHOLDER";
-  static const String color   = "APP_COLOR_PLACEHOLDER";
+  static const String appName = String.fromEnvironment(
+    'APP_NAME',
+    defaultValue: 'Ehost Local',
+  );
+
+  static const String apiUrl = String.fromEnvironment(
+    'API_URL',
+    defaultValue: 'https://acesso.ehostsolucoes.com.br/super/apps/?id=985',
+  );
+
+  static const String color = String.fromEnvironment(
+    'APP_COLOR',
+    defaultValue: '#2196F3',
+  );
 }

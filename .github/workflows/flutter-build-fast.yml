@@ -11,6 +11,10 @@ on:
         description: "URL da API"
         required: false
         default: "https://acesso.ehostsolucoes.com.br/super/apps/?id=985"
+      app_color:
+        description: "Cor primária do App"
+        required: false
+        default: "#2196F3"
       package_name:
         description: "Pacote do App (ex: com.appehost.ehost)"
         required: false
@@ -69,19 +73,22 @@ jobs:
       - name: Configurar variáveis no código
         run: |
           echo "Substituindo variáveis..."
-          sed -i "s|android:label=\"[^\"]*\"|android:label=\"${{ github.event.inputs.app_name }}\"|g" android/app/src/main/AndroidManifest.xml
-          sed -i "s|APP_NAME_PLACEHOLDER|${{ github.event.inputs.app_name }}|g" lib/config.dart || true
-          sed -i "s|API_URL_PLACEHOLDER|${{ github.event.inputs.api_url }}|g" lib/config.dart || true
+          sed -i "s|android:label=\"[^\"]*\"|android:label=\"${{ github.event.inputs.app_name }}\"|g" android/app/src/main/AndroidManifest.xml          
           sed -i "s|applicationId = \".*\"|applicationId = \"${{ github.event.inputs.package_name }}\"|g" android/app/build.gradle.kts
+          sed -i "s|namespace = \".*\"|namespace = \"${{ github.event.inputs.package_name }}\"|g" android/app/build.gradle.kts
+
 
       # 7. Build APK debug rápido (somente arm64)
       - name: Build Fast APK
         run: |
           flutter build apk \
-            --release \
+            --debug \
             --target-platform android-arm64 \
             --build-name=${{ github.event.inputs.build_name }} \
-            --build-number=${{ github.event.inputs.build_number }}
+            --build-number=${{ github.event.inputs.build_number }} \
+            --dart-define=APP_NAME=${{ github.event.inputs.app_name }} \
+            --dart-define=API_URL=${{ github.event.inputs.api_url }} \
+            --dart-define=APP_COLOR=${{ github.event.inputs.app_color }}
 
       # 8. Upload artefato
       - name: Upload Fast APK
