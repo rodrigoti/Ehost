@@ -75,7 +75,6 @@ jobs:
           echo "Substituindo variáveis..."
           sed -i "s|android:label=\"[^\"]*\"|android:label=\"${{ github.event.inputs.app_name }}\"|g" android/app/src/main/AndroidManifest.xml          
           sed -i "s|applicationId = \".*\"|applicationId = \"${{ github.event.inputs.package_name }}\"|g" android/app/build.gradle.kts
-          sed -i "s|namespace = \".*\"|namespace = \"${{ github.event.inputs.package_name }}\"|g" android/app/build.gradle.kts
 
 
       # 7. Build APK debug rápido (somente arm64)
