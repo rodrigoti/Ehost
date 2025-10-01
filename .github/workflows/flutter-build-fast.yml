@@ -86,9 +86,9 @@ jobs:
             --target-platform android-arm64 \
             --build-name=${{ github.event.inputs.build_name }} \
             --build-number=${{ github.event.inputs.build_number }} \
-            --dart-define=APP_NAME=${{ github.event.inputs.app_name }} \
-            --dart-define=API_URL=${{ github.event.inputs.api_url }} \
-            --dart-define=APP_COLOR=${{ github.event.inputs.app_color }}
+            --dart-define="APP_NAME=${{ github.event.inputs.app_name }}" \
+            --dart-define="API_URL=${{ github.event.inputs.api_url }}" \
+            --dart-define="APP_COLOR=${{ github.event.inputs.app_color }}"
 
       # 8. Upload artefato
       - name: Upload Fast APK
