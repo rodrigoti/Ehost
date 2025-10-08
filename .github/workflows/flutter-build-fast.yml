@@ -29,16 +29,16 @@ on:
         default: "1"
 
       logo_url:
-        description: "URL do logo"
+        description: "https://acesso.ehostsolucoes.com.br/uploads/assets/logo.png"
         required: false
       splash_url:
-        description: "URL da splash"
+        description: "https://acesso.ehostsolucoes.com.br/uploads/assets/app/splash.png"
         required: false
       icon_url:
-        description: "URL do ícone"
+        description: "https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon.png"
         required: false
       icon_android_url:
-        description: "URL do ícone Android"
+        description: "https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon-android.png"
         required: false
 
 
