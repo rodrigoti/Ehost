@@ -28,6 +28,27 @@ on:
         required: false
         default: "1"
 
+      logo_url:
+        description: "URL do logo"
+        required: false
+      splash_url:
+        description: "URL da splash"
+        required: false
+      icon_url:
+        description: "URL do ícone"
+        required: false
+      icon_android_url:
+        description: "URL do ícone Android"
+        required: false
+
+
+
+
+# 🔹 Aqui está o bloqueio de concorrência
+concurrency:
+  group: flutter-build-fast
+  cancel-in-progress: true
+
 jobs:
   build-fast:
     runs-on: ubuntu-latest
@@ -68,6 +89,14 @@ jobs:
       # 5. Install dependencies
       - name: Install dependencies
         run: flutter pub get
+
+      # 6. Download imagens (se fornecidas)
+      - name: Download image assets
+        run: |
+          curl -L ${{ github.event.inputs.logo_url }} -o assets/logo.png
+          curl -L ${{ github.event.inputs.splash_url }} -o assets/app/splash.png
+          curl -L ${{ github.event.inputs.icon_url }} -o assets/app/icon.png
+          curl -L ${{ github.event.inputs.icon_android_url }} -o assets/app/icon-android.png
 
       # 6. Substituir cores no pubspec.yaml
       - name: Update Colors in pubspec.yaml
