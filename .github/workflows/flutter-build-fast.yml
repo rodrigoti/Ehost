@@ -29,17 +29,24 @@ on:
         default: "1"
 
       logo_url:
-        description: "https://acesso.ehostsolucoes.com.br/uploads/assets/logo.png"
+        description: "URL do logo"
         required: false
+        default: "https://acesso.ehostsolucoes.com.br/uploads/assets/logo.png"
+
       splash_url:
-        description: "https://acesso.ehostsolucoes.com.br/uploads/assets/app/splash.png"
+        description: "URL da splash"
         required: false
+        default: "https://acesso.ehostsolucoes.com.br/uploads/assets/app/splash.png"
+
       icon_url:
-        description: "https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon.png"
+        description: "URL do ícone"
         required: false
+        default: "https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon.png"
+
       icon_android_url:
-        description: "https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon-android.png"
+        description: "URL do ícone Android"
         required: false
+        default: "https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon-android.png"
 
 
 
