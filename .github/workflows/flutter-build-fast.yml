@@ -28,14 +28,6 @@ on:
         required: false
         default: "1"
 
-      build_type:
-        description: "Tipo de build (debug ou release)"
-        required: false
-        default: "debug"
-        type: choice
-        options:
-          - debug
-          - release
 
       logo_url:
         description: "URL do logo"
