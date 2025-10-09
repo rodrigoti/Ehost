@@ -29,13 +29,9 @@ on:
         default: "1"
         
       build_type:
-        description: "Tipo de build"
+        description: "Tipo de build (debug ou release_aab)"
         required: true
         default: "debug"
-        type: choice
-        options:
-          - debug
-          - release_aab
 
       logo_url:
         description: "URL do logo"
