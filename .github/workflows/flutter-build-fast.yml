@@ -139,9 +139,9 @@ jobs:
               --dart-define="API_URL=${{ github.event.inputs.api_url }}" \
               --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}" \
               --dart-define="KEYSTORE_PATH=android/app/keystore.jks" \
-              --dart-define="KEYSTORE_PASSWORD=senha_do_keystore" \
-              --dart-define="KEY_ALIAS=alias" \
-              --dart-define="KEY_PASSWORD=senha_da_chave"
+              --dart-define="KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" \
+              --dart-define="KEY_ALIAS=${{ secrets.KEY_ALIAS }}" \
+              --dart-define="KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}"
           fi
 
       # 12. Upload artefatos
