@@ -158,10 +158,18 @@ jobs:
               --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}"
           fi
 
-      # 6. Upload artefato
-      - name: Upload Build Artifact
+      # 6. Upload artefato - Debug
+      - name: Upload Debug APK
+        if: ${{ github.event.inputs.build_type == 'debug' }}
         uses: actions/upload-artifact@v4
         with:
-          name: build-${{ github.event.inputs.build_type }}-${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
-          path: |
-            ${{ github.event.inputs.build_type == 'debug' && 'build/app/outputs/flutter-apk/app-debug.apk' || 'build/app/outputs/bundle/release/app-release.aab' }}
+          name: app-debug-${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
+          path: build/app/outputs/flutter-apk/app-debug.apk
+
+      # 7. Upload artefato - Release AAB
+      - name: Upload Release AAB
+        if: ${{ github.event.inputs.build_type == 'release_aab' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release_aab-${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
+          path: build/app/outputs/bundle/release/app-release.aab
