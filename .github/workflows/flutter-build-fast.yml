@@ -33,25 +33,6 @@ on:
         required: true
         default: "debug"
 
-      logo_url:
-        description: "URL do logo"
-        required: false
-        default: "https://acesso.ehostsolucoes.com.br/uploads/assets/logo.png"
-
-      splash_url:
-        description: "URL da splash"
-        required: false
-        default: "https://acesso.ehostsolucoes.com.br/uploads/assets/app/splash.png"
-
-      icon_url:
-        description: "URL do ícone"
-        required: false
-        default: "https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon.png"
-
-      icon_android_url:
-        description: "URL do ícone Android"
-        required: false
-        default: "https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon-android.png"
 
 
 
@@ -102,13 +83,15 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # 6. Download imagens (se fornecidas)
+      # 6. Download imagens (URLs fixas)
       - name: Download image assets
         run: |
-          curl -L ${{ github.event.inputs.logo_url }} -o assets/logo.png
-          curl -L ${{ github.event.inputs.splash_url }} -o assets/app/splash.png
-          curl -L ${{ github.event.inputs.icon_url }} -o assets/app/icon.png
-          curl -L ${{ github.event.inputs.icon_android_url }} -o assets/app/icon-android.png
+          mkdir -p assets/app
+          curl -L https://acesso.ehostsolucoes.com.br/uploads/assets/logo.png -o assets/logo.png
+          curl -L https://acesso.ehostsolucoes.com.br/uploads/assets/app/splash.png -o assets/app/splash.png
+          curl -L https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon.png -o assets/app/icon.png
+          curl -L https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon-android.png -o assets/app/icon-android.png
+
 
       # 6. Substituir cores no pubspec.yaml
       - name: Update Colors in pubspec.yaml
