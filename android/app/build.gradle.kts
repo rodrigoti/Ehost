@@ -34,7 +34,7 @@ android {
     signingConfigs {
         create("release") {
             // Verifica se a variável de ambiente KEYSTORE_PATH existe, caso contrário, usa um caminho padrão (ou lança um erro se for necessário)
-            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "android/app/keystore.jks") // Use o caminho padrão se não for definido
+            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "keystore.jks") // Use o caminho padrão se não for definido
             storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "" // Certifique-se de que este segredo esteja configurado
             keyAlias = System.getenv("KEY_ALIAS") ?: "" // Certifique-se de que este segredo esteja configurado
             keyPassword = System.getenv("KEY_PASSWORD") ?: "" // Certifique-se de que este segredo esteja configurado

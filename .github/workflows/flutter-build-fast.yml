@@ -134,7 +134,7 @@ jobs:
               --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}"
           else # Isto será para 'release_aab_keystore'
             # Definindo variáveis de ambiente que o build.gradle.kts irá ler
-            export KEYSTORE_PATH="android/app/keystore.jks"
+            export KEYSTORE_PATH="keystore.jks"
             export KEYSTORE_PASSWORD="${{ secrets.KEYSTORE_PASSWORD }}"
             export KEY_ALIAS="${{ secrets.KEY_ALIAS }}"
             export KEY_PASSWORD="${{ secrets.KEY_PASSWORD }}"
