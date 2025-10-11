@@ -1,9 +1,7 @@
-import java.util.Properties
-import java.io.FileInputStream
-
 plugins {
     id("com.android.application")
     id("kotlin-android")
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -22,49 +20,33 @@ android {
     }
 
     defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.appehost.ehost"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
-    // ----------------------------
-    // Carrega key.properties se existir
-    // ----------------------------
-    val keystoreProperties = Properties()
-    val keystorePropertiesFile = rootProject.file("key.properties")
-    if (keystorePropertiesFile.exists()) {
-        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-    }
 
     signingConfigs {
         create("release") {
-            if (keystorePropertiesFile.exists()) {
-                storeFile = keystoreProperties["storeFile"]?.let { file(it) }
-                storePassword = keystoreProperties["storePassword"] as String?
-                keyAlias = keystoreProperties["keyAlias"] as String?
-                keyPassword = keystoreProperties["keyPassword"] as String?
-            }
-        }
-
-        getByName("debug") {
-            // mantém debug padrão
+            // Verifica se a variável de ambiente KEYSTORE_PATH existe, caso contrário, usa um caminho padrão (ou lança um erro se for necessário)
+            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "android/app/keystore.jks") // Use o caminho padrão se não for definido
+            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "" // Certifique-se de que este segredo esteja configurado
+            keyAlias = System.getenv("KEY_ALIAS") ?: "" // Certifique-se de que este segredo esteja configurado
+            keyPassword = System.getenv("KEY_PASSWORD") ?: "" // Certifique-se de que este segredo esteja configurado
         }
     }
 
     buildTypes {
-        getByName("release") {
-            signingConfig = if (keystorePropertiesFile.exists()) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
-            }
-            isMinifyEnabled = false
-        }
-
-        getByName("debug") {
-            signingConfig = signingConfigs.getByName("debug")
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
