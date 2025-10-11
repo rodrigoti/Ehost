@@ -90,7 +90,9 @@ jobs:
       - name: Download keystore
         if: ${{ github.event.inputs.build_type == 'release_aab_keystore' }}
         run: |
-          curl -L https://acesso.ehostsolucoes.com.br/uploads/assets/keystore.jks -o android/app/keystore.jks
+          curl -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" \
+            https://acesso.ehostsolucoes.com.br/uploads/assets/keystore.jks \
+            -o android/app/keystore.jks
 
       # 8. Substituir cores no pubspec.yaml
       - name: Update Colors in pubspec.yaml
