@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -26,39 +29,42 @@ android {
         versionName = flutter.versionName
     }
 
+    // ----------------------------
     // Carrega key.properties se existir
-    def keystoreProperties = new Properties()
-    def keystorePropertiesFile = rootProject.file("key.properties")
+    // ----------------------------
+    val keystoreProperties = Properties()
+    val keystorePropertiesFile = rootProject.file("key.properties")
     if (keystorePropertiesFile.exists()) {
-        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
     }
 
     signingConfigs {
-        release {
+        create("release") {
             if (keystorePropertiesFile.exists()) {
-                storeFile file(keystoreProperties["storeFile"])
-                storePassword keystoreProperties["storePassword"]
-                keyAlias keystoreProperties["keyAlias"]
-                keyPassword keystoreProperties["keyPassword"]
+                storeFile = keystoreProperties["storeFile"]?.let { file(it) }
+                storePassword = keystoreProperties["storePassword"] as String?
+                keyAlias = keystoreProperties["keyAlias"] as String?
+                keyPassword = keystoreProperties["keyPassword"] as String?
             }
         }
-        debug {
-            // Mantém debug padrão
+
+        getByName("debug") {
+            // mantém debug padrão
         }
     }
 
     buildTypes {
-        release {
-            // Só usa o release signingConfig se key.properties existir
-            if (keystorePropertiesFile.exists()) {
-                signingConfig signingConfigs.release
+        getByName("release") {
+            signingConfig = if (keystorePropertiesFile.exists()) {
+                signingConfigs.getByName("release")
             } else {
-                signingConfig signingConfigs.debug
+                signingConfigs.getByName("debug")
             }
-            minifyEnabled false
+            isMinifyEnabled = false
         }
-        debug {
-            signingConfig signingConfigs.debug
+
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 }
