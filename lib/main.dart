@@ -21,8 +21,8 @@ Future<void> main() async {
   // Configura o estilo da barra de status
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      systemNavigationBarColor: Color(0xff133683),
-      statusBarColor: Color(0xff133683),
+      systemNavigationBarColor: Colors.black,
+      statusBarColor: Colors.black,
       systemNavigationBarIconBrightness: Brightness.light,
       statusBarIconBrightness: Brightness.light,
     ),
@@ -78,10 +78,10 @@ class NewVersionPlus extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: AnnotatedRegion<SystemUiOverlayStyle>(
         value: const SystemUiOverlayStyle(
-          statusBarColor: Color(0xff133683), // cor de fundo da status bar
+          statusBarColor: Colors.black, // cor de fundo da status bar
           statusBarIconBrightness: Brightness.light, // ícones brancos (Android)
           statusBarBrightness: Brightness.dark, // texto branco (iOS)
-          systemNavigationBarColor: Color(0xff133683),
+          systemNavigationBarColor: Colors.black,
           systemNavigationBarIconBrightness: Brightness.light,
         ),
         child: Builder(
@@ -271,8 +271,21 @@ class _InicioState extends State<Inicio> {
 
   @override
   Widget build(BuildContext context) {
+    // Garante a cor preta da barra de status em cada build
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.black,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
+      systemNavigationBarColor: Colors.black,
+      systemNavigationBarIconBrightness: Brightness.light,
+    ));
     return Scaffold(
-      body: SafeArea(child: Stack(children: [Site, Preload])),
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        top: true,
+        bottom: true,
+        child: Stack(children: [Site, Preload]),
+      ),
     );
   }
 }
