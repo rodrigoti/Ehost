@@ -1,7 +1,6 @@
 /// Arquivo de configuração que será sobrescrito pelo GitHub Actions
 /// usando `sed` no workflow flutter-build.yml
 
- 
 class AppSettings {
   static const String appName = String.fromEnvironment(
     'APP_NAME',
@@ -13,9 +12,18 @@ class AppSettings {
     defaultValue: 'https://acesso.ehostsolucoes.com.br/super/apps/?id=985',
   );
 
-/*   static const String appIconColor = String.fromEnvironment(
+  static const String androidId = String.fromEnvironment(
+    'package_name',
+    defaultValue: 'com.appehost.ehost',
+  );
+
+  static const String iOSId = String.fromEnvironment(
+    'ios_id',
+    defaultValue: 'xxxx',
+  );
+
+  /*   static const String appIconColor = String.fromEnvironment(
     'APP_ICON_COLOR',
     defaultValue: '#FFE05F',
   ); */
-
 }

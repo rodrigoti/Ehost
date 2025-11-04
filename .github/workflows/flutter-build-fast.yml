@@ -22,7 +22,7 @@ on:
       build_name:
         description: "Versão (ex: 0.0.1)"
         required: false
-        default: "0.0.1"
+        default: "1.0.0"
       build_number:
         description: "Número interno (ex: 1)"
         required: false

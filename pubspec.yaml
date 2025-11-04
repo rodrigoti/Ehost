@@ -1,5 +1,5 @@
 name: ehost
-version: 0.0.1+1 
+version: 1.0.0+1 
 
 
 description: "A new Flutter project."
@@ -42,12 +42,14 @@ dependencies:
   fluttertoast: ^8.2.12 
   share_plus: ^11.1.0
   url_launcher: ^6.1.11
-  radio_player: ^1.4.1
+  radio_player: ^2.2.1
   http: ^1.1.0
   new_version_plus: ^0.1.1  
+  firebase_core: ^4.2.0  
+  firebase_messaging: ^16.0.3 
 
 
-flutter_native_splash:
+flutter_native_splash: 
   color: "#FFE05F"
   image: "assets/app/splash.png"
   android: true

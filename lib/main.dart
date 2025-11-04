@@ -1,38 +1,107 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:radio_player/radio_player.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'funcoes.dart';
 import 'config.dart';
+import 'new_version_plus.dart';
 
-void main() => {
-      SystemChrome.setSystemUIOverlayStyle(
-        const SystemUiOverlayStyle(
-          systemNavigationBarColor: Color(0xff171815), // navigation bar color
-          statusBarColor: Color(0xff171815),
-          systemNavigationBarIconBrightness: Brightness.dark,
-          statusBarIconBrightness: Brightness.dark,
-        ),
-      ),
-      WidgetsFlutterBinding.ensureInitialized(),
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-          .then(
-        (value) => runApp(MyApp()),
-      )
-    };
 
-class MyApp extends StatelessWidget {
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // Função chamada para processar notificações em background
+  print('Recebeu uma mensagem em background: [32m${message.messageId}[0m');
+}
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Configura o estilo da barra de status
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      systemNavigationBarColor: Color(0xff133683),
+      statusBarColor: Color(0xff133683),
+      systemNavigationBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
+
+  // Trava a orientação para retrato
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  await Firebase.initializeApp();
+
+  // Configura o handler para mensagens em segundo plano
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Inicia o app PRIMEIRO
+  runApp(const NewVersionPlus());
+
+  // Configura FCM DEPOIS que o app já está rodando
+  _delayedFCMSetup();
+}
+
+// Configura FCM de forma assíncrona após a inicialização do app
+Future<void> _delayedFCMSetup() async {
+  try {
+    // Aguarda um breve momento para garantir que o app inicializou
+    await Future.delayed(const Duration(seconds: 2));
+
+    // Solicita permissões de notificação
+    final settings = await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    print('Permissões de notificação: [34m${settings.authorizationStatus}[0m');
+
+    // CANCELAR inscrição no tópico antigo (se necessário)
+    // await FirebaseMessaging.instance.unsubscribeFromTopic("br.com.rodrigoti.push");
+
+    // Inscrever no tópico
+    await FirebaseMessaging.instance.subscribeToTopic(AppSettings.androidId);
+    print('✅ Inscrito no tópico: ${AppSettings.androidId}');
+  } catch (e) {
+    print('❌ Erro na configuração FCM: $e');
+  }
+}
+
+class NewVersionPlus extends StatelessWidget {
+  const NewVersionPlus({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Inicio(),
+      home: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Color(0xff133683), // cor de fundo da status bar
+          statusBarIconBrightness: Brightness.light, // ícones brancos (Android)
+          statusBarBrightness: Brightness.dark, // texto branco (iOS)
+          systemNavigationBarColor: Color(0xff133683),
+          systemNavigationBarIconBrightness: Brightness.light,
+        ),
+        child: Builder(
+          builder: (context) {
+            // Chama o update checker aqui, com contexto já válido
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              AppVersionChecker.checkAndPromptUpdate(context);
+            });
+            return MyApp();
+          },
+        ),
+      ),
     );
+  }
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(debugShowCheckedModeBanner: false, home: Inicio());
   }
 }
 
@@ -49,13 +118,10 @@ class _InicioState extends State<Inicio> {
   final _controller = WebViewController();
 
   bool isPlaying = false;
-  RadioPlayer radioPlayer = RadioPlayer();
 
   load() {
     _controller
-      ..setJavaScriptMode(
-        JavaScriptMode.unrestricted,
-      )
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -69,9 +135,7 @@ class _InicioState extends State<Inicio> {
                   child: Container(
                     width: 35,
                     height: 35,
-                    child: CircularProgressIndicator(
-                      color: Color(0xff171815),
-                    ),
+                    child: CircularProgressIndicator(color: Color(0xff171815)),
                   ),
                 ),
               );
@@ -107,10 +171,8 @@ class _InicioState extends State<Inicio> {
                             load();
                           });
                         },
-                        child: Text(
-                          "Tentar novamente",
-                        ),
-                      )
+                        child: Text("Tentar novamente"),
+                      ),
                     ],
                     mainAxisAlignment: MainAxisAlignment.center,
                   ),
@@ -140,20 +202,22 @@ class _InicioState extends State<Inicio> {
       ..addJavaScriptChannel(
         'stream',
         onMessageReceived: (JavaScriptMessage message) {
-          radioPlayer.setChannel(
-              title: AppSettings.appName,
-              url: message.message,
-              imagePath: 'assets/logo.png');
+          RadioPlayer.setStation(
+            title: AppSettings.appName,
+            url: message.message,
+            logoAssetPath: 'assets/logo.png',
+          );
 
-          radioPlayer.stateStream.listen((value) {
-            isPlaying = value;
-
+          RadioPlayer.playbackStateStream.listen((state) {
+            isPlaying = state.toString() == 'PlaybackState.playing';
             if (isPlaying) {
               _controller.runJavaScriptReturningResult(
-                  'document.querySelector("#play").classList.remove("mdi-play")+document.querySelector("#play").classList.add("mdi-pause")');
+                'document.querySelector("#play").classList.remove("mdi-play")+document.querySelector("#play").classList.add("mdi-pause")',
+              );
             } else {
               _controller.runJavaScriptReturningResult(
-                  'document.querySelector("#play").classList.add("mdi-play")+document.querySelector("#play").classList.remove("mdi-pause")');
+                'document.querySelector("#play").classList.add("mdi-play")+document.querySelector("#play").classList.remove("mdi-pause")',
+              );
             }
           });
         },
@@ -163,9 +227,11 @@ class _InicioState extends State<Inicio> {
         onMessageReceived: (JavaScriptMessage message) {
           //se false para tudo(serve pra parar o som na TV), se nao altera entre para e tocar
           if (message.message == 'false') {
-            if (isPlaying) radioPlayer.stop();
+            if (isPlaying) {
+              RadioPlayer.reset();
+            }
           } else {
-            isPlaying ? radioPlayer.stop() : radioPlayer.play();
+            isPlaying ? RadioPlayer.reset() : RadioPlayer.play();
           }
         },
       )
@@ -182,7 +248,8 @@ class _InicioState extends State<Inicio> {
         },
       )
       ..loadRequest(
-          Uri.parse(AppSettings.apiUrl)); //"https://acesso.ehostsolucoes.com.br/super/apps/?id=985"
+        Uri.parse(AppSettings.apiUrl),
+      ); //"https://acesso.ehostsolucoes.com.br/super/apps/?id=985"
 
     Site = WillPopScope(
       onWillPop: () async {
@@ -193,9 +260,7 @@ class _InicioState extends State<Inicio> {
           return sair(context);
         }
       },
-      child: WebViewWidget(
-        controller: _controller,
-      ),
+      child: WebViewWidget(controller: _controller),
     );
   }
 
@@ -207,11 +272,7 @@ class _InicioState extends State<Inicio> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [Site, Preload],
-        ),
-      ),
+      body: SafeArea(child: Stack(children: [Site, Preload])),
     );
   }
 }
