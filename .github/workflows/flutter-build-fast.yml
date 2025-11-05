@@ -91,39 +91,39 @@ jobs:
         if: ${{ github.event.inputs.build_type == 'release_aab_keystore' }}
         run: |
           curl -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" \
-            https://acesso.ehostsolucoes.com.br/uploads/assets/keystore.jks \
-            -o android/app/keystore.jks
+          https://acesso.ehostsolucoes.com.br/uploads/assets/keystore.jks \
+          -o android/app/keystore.jks
 
-      # 7.1 Download Firebase Json (opcional)
+      # 8 Download Firebase Json (opcional)
       - name: Download google-services.json
         run: |
-          curl -fL https://acesso.ehostsolucoes.com.br/uploads/assets/google-services.json -o android/app/src/google-services.json
+          curl -fL -H 'Cache-Control: no-cache' https://acesso.ehostsolucoes.com.br/uploads/assets/google-services.json -o android/app/src/google-services.json
           if [ -f android/app/src/google-services.json ] && [ -s android/app/src/google-services.json ]; then
-            echo "google-services.json baixado com sucesso."
-          else
-            echo "google-services.json não encontrado para download."
-            exit 1
-          fi
+          echo "google-services.json baixado com sucesso."
+            else
+          echo "google-services.json não encontrado para download."
+          exit 1
+            fi
 
-      # 8. Substituir cores no pubspec.yaml
+      # 9. Substituir cores no pubspec.yaml
       - name: Update Colors in pubspec.yaml
         run: |
           sed -i "s|color: \".*\"|color: \"${{ github.event.inputs.app_icon_color }}\"|g" pubspec.yaml
           sed -i "s|adaptive_icon_background: \".*\"|adaptive_icon_background: \"${{ github.event.inputs.app_icon_color }}\"|g" pubspec.yaml
 
-      # 9. Gerar splash e ícones
+      # 10. Gerar splash e ícones
       - name: Generate Splash & Icons
         run: |
           flutter pub run flutter_native_splash:create
           flutter pub run flutter_launcher_icons:main
 
-      # 10. Configurar variáveis no código
+      # 11. Configurar variáveis no código
       - name: Configurar variáveis no código
         run: |
           sed -i "s|android:label=\"[^\"]*\"|android:label=\"${{ github.event.inputs.app_name }}\"|g" android/app/src/main/AndroidManifest.xml
           sed -i "s|applicationId = \".*\"|applicationId = \"${{ github.event.inputs.package_name }}\"|g" android/app/build.gradle.kts
 
-      # 11. Build Flutter
+      # 12. Build Flutter
       - name: Build Flutter (${{ github.event.inputs.build_type }})
         run: |
           if [ "${{ github.event.inputs.build_type }}" = "debug" ]; then
@@ -159,7 +159,7 @@ jobs:
               --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}"
           fi
 
-      # 12. Upload artefatos
+      # 13. Upload artefatos
       - name: Upload Debug APK
         if: ${{ github.event.inputs.build_type == 'debug' }}
         uses: actions/upload-artifact@v4
