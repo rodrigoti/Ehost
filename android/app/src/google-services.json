@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "810462790479",
+    "project_id": "ehost-b52cc",
+    "storage_bucket": "ehost-b52cc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:810462790479:android:068312e151366e73cc7b3a",
+        "android_client_info": {
+          "package_name": "com.appehost.ehost"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_hwx1JZqOvlhW1R8gEdsJ2HmF6cmy29Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
