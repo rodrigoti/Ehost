@@ -134,7 +134,8 @@ jobs:
               --build-number=${{ github.event.inputs.build_number }} \
               --dart-define="APP_NAME=${{ github.event.inputs.app_name }}" \
               --dart-define="API_URL=${{ github.event.inputs.api_url }}" \
-              --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}"
+              --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}" \
+              --dart-define="PACKAGE_NAME=${{ github.event.inputs.package_name }}"
           elif [ "${{ github.event.inputs.build_type }}" = "release_aab" ]; then
             flutter build appbundle \
               --release \
@@ -142,7 +143,8 @@ jobs:
               --build-number=${{ github.event.inputs.build_number }} \
               --dart-define="APP_NAME=${{ github.event.inputs.app_name }}" \
               --dart-define="API_URL=${{ github.event.inputs.api_url }}" \
-              --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}"
+              --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}" \
+              --dart-define="PACKAGE_NAME=${{ github.event.inputs.package_name }}"
           else # Isto será para 'release_aab_keystore'
             # Definindo variáveis de ambiente que o build.gradle.kts irá ler
             export KEYSTORE_PATH="keystore.jks"
@@ -156,7 +158,8 @@ jobs:
               --build-number=${{ github.event.inputs.build_number }} \
               --dart-define="APP_NAME=${{ github.event.inputs.app_name }}" \
               --dart-define="API_URL=${{ github.event.inputs.api_url }}" \
-              --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}"
+              --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}" \
+              --dart-define="PACKAGE_NAME=${{ github.event.inputs.package_name }}"
           fi
 
       # 13. Upload artefatos

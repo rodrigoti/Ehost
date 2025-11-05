@@ -13,12 +13,12 @@ class AppSettings {
   );
 
   static const String androidId = String.fromEnvironment(
-    'package_name',
+    'PACKAGE_NAME',
     defaultValue: 'com.appehost.ehost',
   );
 
   static const String iOSId = String.fromEnvironment(
-    'ios_id',
+    'IOS_ID',
     defaultValue: 'xxxx',
   );
 

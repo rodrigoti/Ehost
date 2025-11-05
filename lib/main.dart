@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -8,7 +7,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'funcoes.dart';
 import 'config.dart';
 import 'new_version_plus.dart';
-
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Função chamada para processar notificações em background
@@ -56,7 +54,9 @@ Future<void> _delayedFCMSetup() async {
       sound: true,
     );
 
-    print('Permissões de notificação: [34m${settings.authorizationStatus}[0m');
+    print(
+      'Permissões de notificação: [34m${settings.authorizationStatus}[0m',
+    );
 
     // CANCELAR inscrição no tópico antigo (se necessário)
     // await FirebaseMessaging.instance.unsubscribeFromTopic("br.com.rodrigoti.push");
@@ -64,6 +64,8 @@ Future<void> _delayedFCMSetup() async {
     // Inscrever no tópico
     await FirebaseMessaging.instance.subscribeToTopic(AppSettings.androidId);
     print('✅ Inscrito no tópico: ${AppSettings.androidId}');
+
+    
   } catch (e) {
     print('❌ Erro na configuração FCM: $e');
   }
@@ -272,13 +274,15 @@ class _InicioState extends State<Inicio> {
   @override
   Widget build(BuildContext context) {
     // Garante a cor preta da barra de status em cada build
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.black,
-      statusBarIconBrightness: Brightness.light,
-      statusBarBrightness: Brightness.dark,
-      systemNavigationBarColor: Colors.black,
-      systemNavigationBarIconBrightness: Brightness.light,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.black,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor: Colors.black,
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+    );
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
