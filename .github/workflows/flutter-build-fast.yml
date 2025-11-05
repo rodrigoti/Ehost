@@ -98,11 +98,12 @@ jobs:
       - name: Download google-services.json
         run: |
           curl -fL https://acesso.ehostsolucoes.com.br/uploads/assets/google-services.json -o android/app/src/google-services.json
-          if [ -f android/app/google-services.json ] && [ -s android/app/google-services.json ]; then
-          echo "google-services.json baixado com sucesso."
-            else
-          echo "google-services.json não encontrado para download."
-            fi
+          if [ -f android/app/src/google-services.json ] && [ -s android/app/src/google-services.json ]; then
+            echo "google-services.json baixado com sucesso."
+          else
+            echo "google-services.json não encontrado para download."
+            exit 1
+          fi
 
       # 8. Substituir cores no pubspec.yaml
       - name: Update Colors in pubspec.yaml
