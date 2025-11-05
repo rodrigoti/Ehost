@@ -94,6 +94,16 @@ jobs:
             https://acesso.ehostsolucoes.com.br/uploads/assets/keystore.jks \
             -o android/app/keystore.jks
 
+      # 7.1 Download Firebase Json (opcional)
+      - name: Download google-services.json
+        run: |
+          curl -L https://acesso.ehostsolucoes.com.br/uploads/assets/google-services.json -o android/app/google-services.json || true
+          if [ -f android/app/google-services.json ]; then
+        echo "google-services.json baixado com sucesso."
+          else
+        echo "google-services.json não encontrado para download."
+          fi
+
       # 8. Substituir cores no pubspec.yaml
       - name: Update Colors in pubspec.yaml
         run: |
