@@ -81,10 +81,10 @@ jobs:
       - name: Download image assets
         run: |
           mkdir -p assets/app
-          curl -L https://acesso.ehostsolucoes.com.br/uploads/assets/logo.png -o assets/logo.png
-          curl -L https://acesso.ehostsolucoes.com.br/uploads/assets/app/splash.png -o assets/app/splash.png
-          curl -L https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon.png -o assets/app/icon.png
-          curl -L https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon-android.png -o assets/app/icon-android.png
+          curl -L -H 'Cache-Control: no-cache' https://acesso.ehostsolucoes.com.br/uploads/assets/logo.png -o assets/logo.png
+          curl -L -H 'Cache-Control: no-cache' https://acesso.ehostsolucoes.com.br/uploads/assets/app/splash.png -o assets/app/splash.png
+          curl -L -H 'Cache-Control: no-cache' https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon.png -o assets/app/icon.png
+          curl -L -H 'Cache-Control: no-cache' https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon-android.png -o assets/app/icon-android.png
 
       # 7. Download Keystore (opcional)
       - name: Download keystore
