@@ -90,9 +90,15 @@ jobs:
       - name: Download keystore
         if: ${{ github.event.inputs.build_type == 'release_aab_keystore' }}
         run: |
-          curl -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" \
+          curl -fL -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" \
           https://acesso.ehostsolucoes.com.br/uploads/assets/keystore.jks \
           -o android/app/keystore.jks
+          if [ -f android/app/keystore.jks ] && [ -s android/app/keystore.jks ]; then
+            echo "Keystore file downloaded successfully."
+          else
+            echo "Failed to download keystore file."
+            exit 1
+          fi
 
       # 8 Download Firebase Json (opcional)
       - name: Download google-services.json
