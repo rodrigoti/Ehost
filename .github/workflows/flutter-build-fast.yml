@@ -169,30 +169,28 @@ jobs:
           fi
 
       # 13. Upload artefatos
-
-      # DEBUG → continua como artifact (não público)
       - name: Upload Debug APK
         if: ${{ github.event.inputs.build_type == 'debug' }}
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
           path: build/app/outputs/flutter-apk/app-debug.apk
-          retention-days: 7 # Mantém o artefato por 7 dias
 
-      # RELEASE → publica automaticamente em GitHub Releases (público)
-      - name: Verificar existência do arquivo AAB
+      - name: Upload Release AAB
         if: ${{ github.event.inputs.build_type != 'debug' }}
-        run: |
-          if [ ! -f build/app/outputs/bundle/release/app-release.aab ]; then
-            echo "Erro: O arquivo app-release.aab não foi encontrado."
-            exit 1
-          fi
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-${{ github.event.inputs.build_type }}-${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
+          path: build/app/outputs/bundle/release/app-release.aab
 
-      - name: Publish Release AAB to GitHub Releases
+      # 14. Publicar artefatos no GitHub Release
+      - name: Publish APK/AAB to GitHub Releases
         if: ${{ github.event.inputs.build_type != 'debug' }}
         uses: softprops/action-gh-release@v1
         with:
-          files: build/app/outputs/bundle/release/app-release.aab
+          files: |
+            build/app/outputs/flutter-apk/app-debug.apk
+            build/app/outputs/bundle/release/app-release.aab
           tag_name: v${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
           name: "Release ${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}"
           body: |
