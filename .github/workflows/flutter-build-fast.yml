@@ -177,6 +177,7 @@ jobs:
         with:
           name: app-debug-${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
           path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 7 # Mantém o artefato por 7 dias
 
       # RELEASE → publica automaticamente em GitHub Releases (público)
       - name: Publish Release AAB to GitHub Releases
@@ -186,5 +187,11 @@ jobs:
           files: build/app/outputs/bundle/release/app-release.aab
           tag_name: v${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
           name: "Release ${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}"
+          body: |
+        ## Changelog
+        - Build Name: ${{ github.event.inputs.build_name }}
+        - Build Number: ${{ github.event.inputs.build_number }}
+        - App Name: ${{ github.event.inputs.app_name }}
+        - API URL: ${{ github.event.inputs.api_url }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
