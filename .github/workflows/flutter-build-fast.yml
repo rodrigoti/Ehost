@@ -1,4 +1,4 @@
-name: Flutter Build (Fast) 
+name: Flutter Build (Fast)
 
 on:
   workflow_dispatch:
@@ -28,7 +28,7 @@ on:
         required: false
         default: "1"
       build_type:
-        description: "Tipo de build (debug / release_aab / release_aab_keystore)"
+        description: "Tipo de build (debug / release_aab_keystore)"
         required: true
         default: "debug"
 
@@ -44,17 +44,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Flutter
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.2'
+          flutter-version: "3.35.2"
 
-      # 3. Cache Flutter dependencies
       - name: Cache Flutter dependencies
         uses: actions/cache@v4
         with:
@@ -62,10 +59,7 @@ jobs:
             ~/.pub-cache
             build
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
 
-      # 4. Cache Gradle
       - name: Cache Gradle
         uses: actions/cache@v4
         with:
@@ -73,110 +67,73 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
 
-      # 5. Install dependencies
       - name: Install dependencies
         run: flutter pub get
 
-      # 6. Download imagens (URLs fixas)
       - name: Download image assets
         run: |
           mkdir -p assets/app
-          curl -L -H 'Cache-Control: no-cache' https://acesso.ehostsolucoes.com.br/uploads/assets/logo.png -o assets/logo.png
-          curl -L -H 'Cache-Control: no-cache' https://acesso.ehostsolucoes.com.br/uploads/assets/app/splash.png -o assets/app/splash.png
-          curl -L -H 'Cache-Control: no-cache' https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon.png -o assets/app/icon.png
-          curl -L -H 'Cache-Control: no-cache' https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon-android.png -o assets/app/icon-android.png
+          curl -L https://acesso.ehostsolucoes.com.br/uploads/assets/logo.png -o assets/logo.png
+          curl -L https://acesso.ehostsolucoes.com.br/uploads/assets/app/splash.png -o assets/app/splash.png
+          curl -L https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon.png -o assets/app/icon.png
+          curl -L https://acesso.ehostsolucoes.com.br/uploads/assets/app/icon-android.png -o assets/app/icon-android.png
 
-      # 7. Download Keystore (opcional)
-      - name: Download keystore
-        if: ${{ github.event.inputs.build_type == 'release_aab_keystore' }}
-        run: |
-          curl -fL -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" \
-          https://acesso.ehostsolucoes.com.br/uploads/assets/keystore.jks \
-          -o android/app/keystore.jks
-          if [ -f android/app/keystore.jks ] && [ -s android/app/keystore.jks ]; then
-            echo "Keystore file downloaded successfully."
-          else
-            echo "Failed to download keystore file."
-            exit 1
-          fi
-
-      # 8 Download Firebase Json (opcional)
       - name: Download google-services.json
         run: |
-          curl -fL -H 'Cache-Control: no-cache' https://acesso.ehostsolucoes.com.br/uploads/assets/google-services.json -o android/app/src/google-services.json
-          if [ -f android/app/src/google-services.json ] && [ -s android/app/src/google-services.json ]; then
-          echo "google-services.json baixado com sucesso."
-            else
-          echo "google-services.json não encontrado para download."
-          exit 1
-            fi
+          curl -fL https://acesso.ehostsolucoes.com.br/uploads/assets/google-services.json \
+            -o android/app/src/google-services.json
+          test -s android/app/src/google-services.json
 
-      # 9. Substituir cores no pubspec.yaml
       - name: Update Colors in pubspec.yaml
         run: |
           sed -i "s|color: \".*\"|color: \"${{ github.event.inputs.app_icon_color }}\"|g" pubspec.yaml
           sed -i "s|adaptive_icon_background: \".*\"|adaptive_icon_background: \"${{ github.event.inputs.app_icon_color }}\"|g" pubspec.yaml
 
-      # 10. Gerar splash e ícones
       - name: Generate Splash & Icons
         run: |
           flutter pub run flutter_native_splash:create
           flutter pub run flutter_launcher_icons:main
 
-      # 11. Configurar variáveis no código
       - name: Configurar variáveis no código
         run: |
           sed -i "s|android:label=\"[^\"]*\"|android:label=\"${{ github.event.inputs.app_name }}\"|g" android/app/src/main/AndroidManifest.xml
           sed -i "s|applicationId = \".*\"|applicationId = \"${{ github.event.inputs.package_name }}\"|g" android/app/build.gradle.kts
 
-      # 12. Build Flutter
-      - name: Build Flutter (${{ github.event.inputs.build_type }})
+      # ---------------------------------------------------------
+      # RELEASE KEYS — SOMENTE SE FOR release_aab_keystore
+      # ---------------------------------------------------------
+      - name: Download keystore
+        if: ${{ github.event.inputs.build_type == 'release_aab_keystore' }}
         run: |
-          if [ "${{ github.event.inputs.build_type }}" = "debug" ]; then
-            flutter build apk \
-              --debug \
-              --target-platform android-arm64 \
-              --build-name=${{ github.event.inputs.build_name }} \
-              --build-number=${{ github.event.inputs.build_number }} \
-              --dart-define="APP_NAME=${{ github.event.inputs.app_name }}" \
-              --dart-define="API_URL=${{ github.event.inputs.api_url }}" \
-              --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}" \
-              --dart-define="PACKAGE_NAME=${{ github.event.inputs.package_name }}"
-          elif [ "${{ github.event.inputs.build_type }}" = "release_aab_keystore" ]; then
-            export KEYSTORE_PATH="keystore.jks"
-            export KEYSTORE_PASSWORD="${{ secrets.KEYSTORE_PASSWORD }}"
-            export KEY_ALIAS="${{ secrets.KEY_ALIAS }}"
-            export KEY_PASSWORD="${{ secrets.KEY_PASSWORD }}"
-            flutter build appbundle \
-              --release \
-              --build-name=${{ github.event.inputs.build_name }} \
-              --build-number=${{ github.event.inputs.build_number }} \
-              --dart-define="APP_NAME=${{ github.event.inputs.app_name }}" \
-              --dart-define="API_URL=${{ github.event.inputs.api_url }}" \
-              --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}" \
-              --dart-define="PACKAGE_NAME=${{ github.event.inputs.package_name }}"
-          fi
+          curl -fL https://acesso.ehostsolucoes.com.br/uploads/assets/keystore.jks -o android/app/keystore.jks
+          test -s android/app/keystore.jks
 
-      # Build Release (APK + AAB)
-      - name: Build Release (APK + AAB)
-        env:
-          KEYSTORE_PATH: android/app/keystore.jks
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      # ---------------------------------------------------------
+      # BUILD DEBUG — APENAS APK
+      # ---------------------------------------------------------
+      - name: Build Debug APK
+        if: ${{ github.event.inputs.build_type == 'debug' }}
         run: |
-          echo "=== Gerando APK ==="
-          flutter build apk --release \
+          flutter build apk --debug \
             --build-name=${{ github.event.inputs.build_name }} \
             --build-number=${{ github.event.inputs.build_number }} \
             --dart-define="APP_NAME=${{ github.event.inputs.app_name }}" \
             --dart-define="API_URL=${{ github.event.inputs.api_url }}" \
             --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}" \
             --dart-define="PACKAGE_NAME=${{ github.event.inputs.package_name }}"
-          echo "=== Gerando AAB ==="
+
+      # ---------------------------------------------------------
+      # BUILD RELEASE — APENAS AAB COM KEYSTORE
+      # ---------------------------------------------------------
+      - name: Build Release AAB (Keystore)
+        if: ${{ github.event.inputs.build_type == 'release_aab_keystore' }}
+        env:
+          KEYSTORE_PATH: android/app/keystore.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
           flutter build appbundle --release \
             --build-name=${{ github.event.inputs.build_name }} \
             --build-number=${{ github.event.inputs.build_number }} \
@@ -185,7 +142,10 @@ jobs:
             --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}" \
             --dart-define="PACKAGE_NAME=${{ github.event.inputs.package_name }}"
 
-      # 13. Upload artefatos
+      # =========================================================
+      # UPLOADS
+      # =========================================================
+
       - name: Upload Debug APK
         if: ${{ github.event.inputs.build_type == 'debug' }}
         uses: actions/upload-artifact@v4
@@ -194,27 +154,23 @@ jobs:
           path: build/app/outputs/flutter-apk/app-debug.apk
 
       - name: Upload Release AAB
-        if: ${{ github.event.inputs.build_type != 'debug' }}
+        if: ${{ github.event.inputs.build_type == 'release_aab_keystore' }}
         uses: actions/upload-artifact@v4
         with:
-          name: app-${{ github.event.inputs.build_type }}-${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
+          name: app-release-${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
           path: build/app/outputs/bundle/release/app-release.aab
 
-      # 14. Publicar artefatos no GitHub Release
+      # =========================================================
+      # RELEASE NO GITHUB
+      # =========================================================
+
       - name: Publish Debug APK to GitHub Releases
         if: ${{ github.event.inputs.build_type == 'debug' }}
         uses: softprops/action-gh-release@v1
         with:
           files: build/app/outputs/flutter-apk/app-debug.apk
           tag_name: v${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}-${{ github.run_number }}
-          target_commitish: ${{ github.sha }}
-          name: "Debug Release ${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}"
-          body: |
-            ## Changelog
-            - Build Name: ${{ github.event.inputs.build_name }}
-            - Build Number: ${{ github.event.inputs.build_number }}
-            - App Name: ${{ github.event.inputs.app_name }}
-            - API URL: ${{ github.event.inputs.api_url }}
+          name: "Debug ${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -224,14 +180,6 @@ jobs:
         with:
           files: build/app/outputs/bundle/release/app-release.aab
           tag_name: v${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}-${{ github.run_number }}
-          target_commitish: ${{ github.sha }}
           name: "Release AAB ${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}"
-          body: |
-            ## Changelog
-            - Build Name: ${{ github.event.inputs.build_name }}
-            - Build Number: ${{ github.event.inputs.build_number }}
-            - App Name: ${{ github.event.inputs.app_name }}
-            - API URL: ${{ github.event.inputs.api_url }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
