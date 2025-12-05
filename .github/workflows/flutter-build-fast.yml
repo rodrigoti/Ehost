@@ -192,7 +192,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            build/app/outputs/flutter-apk/app-debug.apk
+            build/app/outputs/apk/debug/app-debug.apk
             build/app/outputs/bundle/release/app-release.aab
           tag_name: v${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}-${{ github.run_number }}
           target_commitish: ${{ github.sha }}
