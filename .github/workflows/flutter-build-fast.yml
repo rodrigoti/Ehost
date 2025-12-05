@@ -204,6 +204,14 @@ jobs:
           name: app-debug-${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
           path: build/app/outputs/flutter-apk/app-debug.apk
 
+      # Upload Release APK
+      - name: Upload Release APK
+        if: ${{ github.event.inputs.build_type != 'debug' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
+          path: build/app/outputs/flutter-apk/app-release.apk
+
       - name: Upload Release AAB
         if: ${{ github.event.inputs.build_type != 'debug' }}
         uses: actions/upload-artifact@v4
