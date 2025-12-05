@@ -36,6 +36,9 @@ concurrency:
   group: flutter-build-fast
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   build-fast:
     runs-on: ubuntu-latest
