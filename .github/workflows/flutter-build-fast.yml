@@ -194,8 +194,7 @@ jobs:
           files: |
             build/app/outputs/flutter-apk/app-debug.apk
             build/app/outputs/bundle/release/app-release.aab
-          tag_name: v${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
-          target_commitish: ${{ github.sha }}
+          tag_name: v${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}-${{ github.run_number }}
           name: "Release ${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}"
           body: |
             ## Changelog
