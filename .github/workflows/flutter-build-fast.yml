@@ -39,6 +39,9 @@ concurrency:
 permissions:
   contents: write
 
+env:
+  RELEASE_TAG: "test-build"   # <--- nome do release fixo (mude aqui se quiser)
+
 jobs:
   build-fast:
     runs-on: ubuntu-latest
@@ -143,43 +146,61 @@ jobs:
             --dart-define="PACKAGE_NAME=${{ github.event.inputs.package_name }}"
 
       # =========================================================
-      # UPLOADS
+      # UPLOAD ARTEFATOS PARA O RELEASE FIXO (test-build)
+      # - removemos assets antigos (se houver) para manter 1 release limpo
+      # - depois publicamos o novo asset
       # =========================================================
 
-      - name: Upload Debug APK
-        if: ${{ github.event.inputs.build_type == 'debug' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-debug-${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
-          path: build/app/outputs/flutter-apk/app-debug.apk
+      - name: Install jq (used to parse JSON)
+        run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Upload Release AAB
-        if: ${{ github.event.inputs.build_type == 'release_aab_keystore' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release-${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
-          path: build/app/outputs/bundle/release/app-release.aab
+      - name: Prepare release (delete old assets if release exists)
+        env:
+          GITHUB_API: https://api.github.com/repos/${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+        run: |
+          echo "Checking for existing release with tag: $RELEASE_TAG"
+          res=$(curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "$GITHUB_API/releases/tags/$RELEASE_TAG")
+          release_id=$(echo "$res" | jq -r '.id // empty')
 
-      # =========================================================
-      # RELEASE NO GITHUB
-      # =========================================================
+          if [ -n "$release_id" ]; then
+            echo "Found release id: $release_id — deleting existing assets..."
+            asset_ids=$(echo "$res" | jq -r '.assets[]?.id // empty')
+            for aid in $asset_ids; do
+              echo "Deleting asset id: $aid"
+              curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "$GITHUB_API/releases/assets/$aid"
+            done
+            echo "Old assets deleted (if any)."
+          else
+            echo "No existing release with tag $RELEASE_TAG (it will be created)."
+          fi
 
-      - name: Publish Debug APK to GitHub Releases
-        if: ${{ github.event.inputs.build_type == 'debug' }}
+      - name: Upload artifact to GitHub Release (test-build)
+        # We use softprops/action-gh-release to (create +) upload; tag_name fixed to test-build
         uses: softprops/action-gh-release@v1
+        if: ${{ github.event.inputs.build_type == 'debug' }}
         with:
           files: build/app/outputs/flutter-apk/app-debug.apk
-          tag_name: v${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}-${{ github.run_number }}
-          name: "Debug ${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}"
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: "Test Build"
+          body: |
+            Build-type: debug
+            Build name: ${{ github.event.inputs.build_name }}
+            Build number: ${{ github.event.inputs.build_number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish Release AAB to GitHub Releases
-        if: ${{ github.event.inputs.build_type == 'release_aab_keystore' }}
+      - name: Upload AAB to GitHub Release (test-build)
         uses: softprops/action-gh-release@v1
+        if: ${{ github.event.inputs.build_type == 'release_aab_keystore' }}
         with:
           files: build/app/outputs/bundle/release/app-release.aab
-          tag_name: v${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}-${{ github.run_number }}
-          name: "Release AAB ${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}"
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: "Test Build"
+          body: |
+            Build-type: release_aab_keystore
+            Build name: ${{ github.event.inputs.build_name }}
+            Build number: ${{ github.event.inputs.build_number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
