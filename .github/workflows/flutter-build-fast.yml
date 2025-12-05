@@ -145,22 +145,11 @@ jobs:
               --dart-define="API_URL=${{ github.event.inputs.api_url }}" \
               --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}" \
               --dart-define="PACKAGE_NAME=${{ github.event.inputs.package_name }}"
-          elif [ "${{ github.event.inputs.build_type }}" = "release_aab" ]; then
-            flutter build appbundle \
-              --release \
-              --build-name=${{ github.event.inputs.build_name }} \
-              --build-number=${{ github.event.inputs.build_number }} \
-              --dart-define="APP_NAME=${{ github.event.inputs.app_name }}" \
-              --dart-define="API_URL=${{ github.event.inputs.api_url }}" \
-              --dart-define="APP_ICON_COLOR=${{ github.event.inputs.app_icon_color }}" \
-              --dart-define="PACKAGE_NAME=${{ github.event.inputs.package_name }}"
-          else # Isto será para 'release_aab_keystore'
-            # Definindo variáveis de ambiente que o build.gradle.kts irá ler
+          elif [ "${{ github.event.inputs.build_type }}" = "release_aab_keystore" ]; then
             export KEYSTORE_PATH="keystore.jks"
             export KEYSTORE_PASSWORD="${{ secrets.KEYSTORE_PASSWORD }}"
             export KEY_ALIAS="${{ secrets.KEY_ALIAS }}"
             export KEY_PASSWORD="${{ secrets.KEY_PASSWORD }}"
-            
             flutter build appbundle \
               --release \
               --build-name=${{ github.event.inputs.build_name }} \
@@ -204,14 +193,6 @@ jobs:
           name: app-debug-${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
           path: build/app/outputs/flutter-apk/app-debug.apk
 
-      # Upload Release APK
-      - name: Upload Release APK
-        if: ${{ github.event.inputs.build_type != 'debug' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release-${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}
-          path: build/app/outputs/flutter-apk/app-release.apk
-
       - name: Upload Release AAB
         if: ${{ github.event.inputs.build_type != 'debug' }}
         uses: actions/upload-artifact@v4
@@ -220,16 +201,31 @@ jobs:
           path: build/app/outputs/bundle/release/app-release.aab
 
       # 14. Publicar artefatos no GitHub Release
-      - name: Publish APK/AAB to GitHub Releases
-        if: ${{ github.event.inputs.build_type != 'debug' }}
+      - name: Publish Debug APK to GitHub Releases
+        if: ${{ github.event.inputs.build_type == 'debug' }}
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            build/app/outputs/apk/debug/app-debug.apk
-            build/app/outputs/bundle/release/app-release.aab
+          files: build/app/outputs/flutter-apk/app-debug.apk
           tag_name: v${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}-${{ github.run_number }}
           target_commitish: ${{ github.sha }}
-          name: "Release ${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}"
+          name: "Debug Release ${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}"
+          body: |
+            ## Changelog
+            - Build Name: ${{ github.event.inputs.build_name }}
+            - Build Number: ${{ github.event.inputs.build_number }}
+            - App Name: ${{ github.event.inputs.app_name }}
+            - API URL: ${{ github.event.inputs.api_url }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Release AAB to GitHub Releases
+        if: ${{ github.event.inputs.build_type == 'release_aab_keystore' }}
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/outputs/bundle/release/app-release.aab
+          tag_name: v${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}-${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          name: "Release AAB ${{ github.event.inputs.build_name }}+${{ github.event.inputs.build_number }}"
           body: |
             ## Changelog
             - Build Name: ${{ github.event.inputs.build_name }}
