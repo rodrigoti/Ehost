@@ -205,3 +205,9 @@ jobs:
             - API URL: ${{ github.event.inputs.api_url }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Listar arquivos gerados no build
+      - name: List build outputs
+        run: |
+          echo "=== LISTANDO ARQUIVOS ==="
+          find build/app/ -type f -print
