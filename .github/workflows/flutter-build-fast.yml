@@ -106,7 +106,7 @@ jobs:
       - name: Build Release AAB
         if: ${{ github.event.inputs.build_type == 'release_aab_keystore' }}
         env:
-          KEYSTORE_PATH: android/app/keystore.jks
+          KEYSTORE_PATH: keystore.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
