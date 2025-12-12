@@ -7,6 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'funcoes.dart';
 import 'config.dart';
 import 'new_version_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Função chamada para processar notificações em background
@@ -39,6 +40,14 @@ Future<void> main() async {
 
   // Configura FCM DEPOIS que o app já está rodando
   _delayedFCMSetup();
+
+  // Quando o app está em segundo plano e o usuário CLICA na notificação
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    final url = message.data['url'];
+    if (url != null) {
+      launchUrl(Uri.parse(url));
+    }
+  });
 }
 
 // Configura FCM de forma assíncrona após a inicialização do app
@@ -64,8 +73,6 @@ Future<void> _delayedFCMSetup() async {
     // Inscrever no tópico
     await FirebaseMessaging.instance.subscribeToTopic(AppSettings.androidId);
     print('✅ Inscrito no tópico: ${AppSettings.androidId}');
-
-    
   } catch (e) {
     print('❌ Erro na configuração FCM: $e');
   }
