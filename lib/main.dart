@@ -211,11 +211,15 @@ class _InicioState extends State<Inicio> {
       ..addJavaScriptChannel(
         'stream',
         onMessageReceived: (JavaScriptMessage message) {
+
           RadioPlayer.setStation(
             title: AppSettings.appName,
             url: message.message,
             logoAssetPath: 'assets/logo.png',
           );
+          
+          // Autoplay ao configurar a estação
+          RadioPlayer.play();
 
           RadioPlayer.playbackStateStream.listen((state) {
             isPlaying = state.toString() == 'PlaybackState.playing';
